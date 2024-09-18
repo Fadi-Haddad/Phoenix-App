@@ -11,6 +11,19 @@ defmodule PhoenixAppWeb.DataController do
     render(conn, :home, layout: false)
   end
 
+  def add_city(conn, %{"city" => city_params}) do  # pattern-matches with a key called city and assign it to new variable called city_params
+  IO.inspect(city_params, label: "city_params")
+
+  changeset = City.changeset(%City{}, city_params) # Changesets allow filtering, casting, validation of data before sending to db,City is a module.  %City{} is the schema, city_params is a map
+
+  case Repo.insert(changeset) do
+    {:ok, _city} ->
+      json(conn, %{message: "City added successfully"})
+    {:error, changeset} ->
+      json(conn, %{error: changeset.errors})
+  end
+  end
+
   @api_key "82c0017e4dc9413395e184435241709"  # Bad practice
 
   def fetch_weather(city_name) do
@@ -70,14 +83,5 @@ defmodule PhoenixAppWeb.DataController do
     json(conn, response)  # sends response back to client
   end
 
-  def add_city(conn, %{"city" => city_params}) do
-    changeset = City.changeset(%City{}, city_params)
 
-    case Repo.insert(changeset) do
-      {:ok, _city} ->
-        json(conn, %{message: "City added successfully"})
-      {:error, changeset} ->
-        json(conn, %{error: changeset.errors})
-    end
-  end
 end
